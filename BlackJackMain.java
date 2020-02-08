@@ -1,12 +1,20 @@
 import java.util.Random;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class BlackJackMain {
 	public static void main(String[] args) {
 		HetSpel spel = new HetSpel();
+		
 		spel.verkrijgKaarten();
+		
+		Deck.getDeck();
+		Deck.shuffleDeck();
+		
 		spel.speelRonden();
 	}
+
+	
 }
 
 class Kaart{
@@ -30,9 +38,28 @@ class Kaart{
 	
 }
 
+class Deck {
+	private static final int DECK_SIZE = 52;
+	static ArrayList<Integer> deck = new ArrayList<Integer>();
+	static ArrayList<Integer> shuffledDeck = new ArrayList<Integer>();
+	
+	public static void getDeck() {
+		for (int i = 0; i < DECK_SIZE; ++i) {
+            deck.add(i);
+        }
+	}
+	
+	public static void shuffleDeck() {
+		while (deck.size() > 0) {
+            int index = (int) (Math.random() * deck.size());
+            shuffledDeck.add(deck.remove(index));
+        }
+	}
+
+}
+
 class HetSpel {
 	Scanner sc = new Scanner(System.in);
-	Random r = new Random();
 	Kaart[] deKaarten = new Kaart[52];
 	String[] suits = {"Hearts", "Spades", "Diamond","Clubs"};
 	String[] values = {"2", "3", "4","5","6", "7", "8","9","10", "J", "Q","K","A"};
@@ -49,15 +76,24 @@ class HetSpel {
 	}
 	
 	void speelRonden(){
-		for(int i = 0; 5<6 ; i++) {
-			System.out.println("Druk k voor nieuwe kaart of q om te stoppen");
-			String invoer = sc.next();
+		Random r = new Random();
+		boolean speelRonde = true;
+		for(int i = 0; speelRonde ; i++) {
+			System.out.println("Druk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
+			System.out.print("uw invoer:   ");
+			String invoer = sc.next().toLowerCase();
 			if(invoer.equals("q")) {
 				break;
 			}
 			if(invoer.equals("k")) {
-				int uitzoekInt = r.nextInt(52);
-				System.out.println("De kaart die ik krijg is:  "+ deKaarten[uitzoekInt].getSuitName()+ deKaarten[uitzoekInt].getValueName());
+				Integer welkeKaart = Deck.shuffledDeck.get(0);
+				Deck.shuffledDeck.remove(welkeKaart);
+				System.out.println("De kaart die ik krijg is:  "+ deKaarten[welkeKaart].getSuitName()+ deKaarten[welkeKaart].getValueName());
+				System.out.println(Deck.shuffledDeck.toString());
+			}
+			if(invoer.equals("p")) {
+				System.out.println("Je hebt gepast");
+				speelRonde = false;
 			}
 		}
 	}
