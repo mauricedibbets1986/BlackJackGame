@@ -6,24 +6,24 @@ public class BlackJackMain {
 	public static void main(String[] args) {
 		HetSpel spel = new HetSpel();
 		
+		spel.verkrijgKaarten();	
+		
 		spel.giveStartBalance(); 
-		
-		spel.plaatsInzet();
-		
-		spel.verkrijgKaarten();
 		
 		Deck.getDeck();
 		Deck.shuffleDeck();
-		
-		
-		
-		spel.giveFirstCards();
-		spel.speelRonden();
-		
-		spel.beurtBank();
-		
-		spel.checkWinnaar();
-		
+
+		while (Player.getBalance() > 0) {
+			spel.plaatsInzet();		
+			
+			spel.giveFirstCards();
+			spel.speelRonden();
+			
+			spel.beurtBank();
+			
+			spel.checkWinnaar();
+			
+		}
 	}
 
 	
@@ -119,6 +119,10 @@ class Player {
 		roundScore += addToRoundScore;
 	}
 	
+	public static void resetRoundScore() {
+		roundScore = 0;
+	}
+	
 	public static void addKaart(int verkregenKaart) {
 		spelerKaarten.add(verkregenKaart);
 	}
@@ -142,7 +146,6 @@ class Player {
 }
 
 class Bank {
-	static final String bankName = "Bank";
 	private static int roundScoreBank;
 	private static ArrayList<Integer> bankKaarten = new ArrayList<Integer>();
 	
@@ -160,6 +163,10 @@ class Bank {
 	
 	public static void addRoundScoreBank(int addToRoundScoreBank) {
 		roundScoreBank += addToRoundScoreBank;
+	}
+	
+	public static void resetRoundScoreBank() {
+		roundScoreBank = 0;
 	}
 	
 	public static int tweedeKaartBank() {
@@ -241,7 +248,7 @@ class HetSpel {
 	
 	void speelRonden(){
 		boolean speelRonde = true;
-		
+				
 		while (MAX_SCORE > Player.getRoundScore() && speelRonde) {
 			System.out.println("\n\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
 			System.out.print("uw invoer:   ");
@@ -308,6 +315,9 @@ class HetSpel {
 		} else if (Player.getRoundScore() > 21) {
 			System.out.println("\n\nYou busted! je hebt verloren!");
 			Player.substractBalance(Player.getRondeInzet());
+		} else if(Bank.getBankRoundScore() > 21) {
+			System.out.println("\n\nDe bank is busted! Je hebt gewonnen");
+			Player.addBalance(Player.getRondeInzet());
 		} else if (Player.getRoundScore() == Bank.getBankRoundScore()) {
 			System.out.println("\n\nJe hebt even veel als de bank, je behoudt je inzet");
 		} else if (Player.getRoundScore() > Bank.getBankRoundScore()) {
@@ -317,7 +327,10 @@ class HetSpel {
 			System.out.println("\n\nJe hebt minder dan de bank, je hebt verloren.");
 			Player.substractBalance(Player.getRondeInzet());
 		}
-		System.out.printf("Jouw balans is nu %d", Player.getBalance());
+		System.out.printf("Jouw balans is nu %d%n%n", Player.getBalance());
+		
+		Bank.resetRoundScoreBank();
+		Player.resetRoundScore();
 	}
 
 }
