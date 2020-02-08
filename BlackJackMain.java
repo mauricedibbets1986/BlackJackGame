@@ -11,6 +11,7 @@ public class BlackJackMain {
 		Deck.getDeck();
 		Deck.shuffleDeck();
 		
+		spel.giveFirstCards();
 		spel.speelRonden();
 	}
 
@@ -36,6 +37,10 @@ class Kaart{
 		return value;
 	}
 	
+	public int getWaarde() {
+		return waarde;
+	}
+	
 }
 
 class Deck {
@@ -58,10 +63,25 @@ class Deck {
 
 }
 
+class Player {
+	private String name;
+	private int roundScore;
+	private int balance;
+	
+	public int getRoundScore() {
+		return roundScore;
+	}
+	
+	public void addRoundScore(int addToRoundScore) {
+		roundScore += addToRoundScore;
+	}
+	
+}
+
 class HetSpel {
 	Scanner sc = new Scanner(System.in);
 	Kaart[] deKaarten = new Kaart[52];
-	String[] suits = {"Hearts", "Spades", "Diamond","Clubs"};
+	String[] suits = {"Hearts", "Spades", "Diamonds","Clubs"};
 	String[] values = {"2", "3", "4","5","6", "7", "8","9","10", "J", "Q","K","A"};
 	int [] waarden = {2,3,4,5,6,7,8,9,10,10,10,10,11};
 	
@@ -75,11 +95,28 @@ class HetSpel {
 		}
 	}
 	
+	void giveFirstCards() {
+		Integer eersteKaart = Deck.shuffledDeck.get(0);
+		Deck.shuffledDeck.remove(eersteKaart);
+		Integer tweedeKaart = Deck.shuffledDeck.get(0);
+		Deck.shuffledDeck.remove(eersteKaart);
+		
+		System.out.printf("Jouw kaarten zijn: %s %s en een %S %S",
+						deKaarten[eersteKaart].getSuitName(),
+						deKaarten[eersteKaart].getValueName(),
+						deKaarten[tweedeKaart].getSuitName(),
+						deKaarten[tweedeKaart].getValueName()
+						);
+		int firstCardsValue = deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde();
+		System.out.printf("%nJouw kaarten hebben een waarde van: %d", firstCardsValue);
+	}
+	
 	void speelRonden(){
 		Random r = new Random();
 		boolean speelRonde = true;
+		
 		for(int i = 0; speelRonde ; i++) {
-			System.out.println("Druk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
+			System.out.println("\n\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
 			System.out.print("uw invoer:   ");
 			String invoer = sc.next().toLowerCase();
 			if(invoer.equals("q")) {
