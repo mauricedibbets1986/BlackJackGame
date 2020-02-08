@@ -65,14 +65,14 @@ class Deck {
 
 class Player {
 	private String name;
-	private int roundScore;
+	private static int roundScore;
 	private int balance;
 	
-	public int getRoundScore() {
+	public static int getRoundScore() {
 		return roundScore;
 	}
 	
-	public void addRoundScore(int addToRoundScore) {
+	public static void addRoundScore(int addToRoundScore) {
 		roundScore += addToRoundScore;
 	}
 	
@@ -101,14 +101,14 @@ class HetSpel {
 		Integer tweedeKaart = Deck.shuffledDeck.get(0);
 		Deck.shuffledDeck.remove(eersteKaart);
 		
-		System.out.printf("Jouw kaarten zijn: %s %s en een %S %S",
+		System.out.printf("Jouw kaarten zijn: %s %s en een %s %s",
 						deKaarten[eersteKaart].getSuitName(),
 						deKaarten[eersteKaart].getValueName(),
 						deKaarten[tweedeKaart].getSuitName(),
 						deKaarten[tweedeKaart].getValueName()
 						);
-		int firstCardsValue = deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde();
-		System.out.printf("%nJouw kaarten hebben een waarde van: %d", firstCardsValue);
+		Player.addRoundScore(deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde());
+		System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
 	}
 	
 	void speelRonden(){
@@ -125,11 +125,16 @@ class HetSpel {
 			if(invoer.equals("k")) {
 				Integer welkeKaart = Deck.shuffledDeck.get(0);
 				Deck.shuffledDeck.remove(welkeKaart);
-				System.out.println("De kaart die ik krijg is:  "+ deKaarten[welkeKaart].getSuitName()+ deKaarten[welkeKaart].getValueName());
-				System.out.println(Deck.shuffledDeck.toString());
+				System.out.printf("De kaart die ik krijg is een:  %s %s",
+				deKaarten[welkeKaart].getSuitName(),
+				deKaarten[welkeKaart].getValueName());
+				Player.addRoundScore(deKaarten[welkeKaart].getWaarde());
+				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
+				
 			}
 			if(invoer.equals("p")) {
 				System.out.println("Je hebt gepast");
+				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
 				speelRonde = false;
 			}
 		}
