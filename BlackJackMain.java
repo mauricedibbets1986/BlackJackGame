@@ -74,7 +74,12 @@ class Player {
 	}
 	
 	public static void addRoundScore(int addToRoundScore) {
-		roundScore += addToRoundScore;
+		if (roundScore + addToRoundScore > 21) {
+			// check of aas is in spel
+			roundScore += addToRoundScore - 10;
+		} else {
+			roundScore += addToRoundScore;
+		}
 	}
 	
 	public static void addKaart(int verkregenKaart) {
