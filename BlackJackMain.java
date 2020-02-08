@@ -64,6 +64,11 @@ class Deck {
 }
 
 class Player {
+	private static boolean heartsAUsed = false;
+	private static boolean spadesAUsed = false;
+	private static boolean diamondsAUsed = false;
+	private static boolean clubsAUsed = false;
+	
 	private String name;
 	private static int roundScore;
 	private int balance;
@@ -74,12 +79,24 @@ class Player {
 	}
 	
 	public static void addRoundScore(int addToRoundScore) {
-		if (roundScore + addToRoundScore > 21) {
+		
+		if (roundScore + addToRoundScore > HetSpel.MAX_SCORE) {
 			// check of aas is in spel
-			roundScore += addToRoundScore - 10;
-		} else {
-			roundScore += addToRoundScore;
+			if (spelerKaarten.contains(12) && !heartsAUsed) {
+				roundScore = roundScore - 10;
+				heartsAUsed = true;
+			} else if (spelerKaarten.contains(25) && !spadesAUsed) {
+				roundScore = roundScore - 10;
+				spadesAUsed = true;
+			} else if (spelerKaarten.contains(38) && !diamondsAUsed) {
+				roundScore = roundScore - 10;
+				diamondsAUsed = true;
+			} else if (spelerKaarten.contains(51) && !clubsAUsed) {
+				roundScore = roundScore - 10;
+				clubsAUsed = true;
+			}
 		}
+		roundScore += addToRoundScore;
 	}
 	
 	public static void addKaart(int verkregenKaart) {
@@ -93,6 +110,8 @@ class Player {
 }
 
 class HetSpel {
+	final static int MAX_SCORE = 21;
+	
 	Scanner sc = new Scanner(System.in);
 	Kaart[] deKaarten = new Kaart[52];
 	String[] suits = {"Hearts", "Spades", "Diamonds","Clubs"};
@@ -130,7 +149,6 @@ class HetSpel {
 	}
 	
 	void speelRonden(){
-		final int MAX_SCORE = 21;
 		boolean speelRonde = true;
 		
 		while (MAX_SCORE > Player.getRoundScore() && speelRonde) {
