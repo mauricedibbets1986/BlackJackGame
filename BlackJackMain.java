@@ -67,6 +67,7 @@ class Player {
 	private String name;
 	private static int roundScore;
 	private int balance;
+	private static ArrayList<Integer> spelerKaarten = new ArrayList<Integer>();
 	
 	public static int getRoundScore() {
 		return roundScore;
@@ -74,6 +75,14 @@ class Player {
 	
 	public static void addRoundScore(int addToRoundScore) {
 		roundScore += addToRoundScore;
+	}
+	
+	public static void addKaart(int verkregenKaart) {
+		spelerKaarten.add(verkregenKaart);
+	}
+	
+	public static ArrayList<Integer> getSpelerKaarten() {
+		return spelerKaarten;
 	}
 	
 }
@@ -99,9 +108,13 @@ class HetSpel {
 		Integer eersteKaart = Deck.shuffledDeck.get(0);
 		Deck.shuffledDeck.remove(eersteKaart);
 		Integer tweedeKaart = Deck.shuffledDeck.get(0);
-		Deck.shuffledDeck.remove(eersteKaart);
+		Deck.shuffledDeck.remove(tweedeKaart);
 		
-		System.out.printf("Jouw kaarten zijn: %s %s en een %s %s",
+		Player.addKaart(eersteKaart);
+		Player.addKaart(tweedeKaart);
+		
+		
+		System.out.printf("Jouw kaarten zijn: %s%s en een %s%s",
 						deKaarten[eersteKaart].getSuitName(),
 						deKaarten[eersteKaart].getValueName(),
 						deKaarten[tweedeKaart].getSuitName(),
@@ -112,31 +125,40 @@ class HetSpel {
 	}
 	
 	void speelRonden(){
-		Random r = new Random();
+		final int MAX_SCORE = 21;
 		boolean speelRonde = true;
 		
-		for(int i = 0; speelRonde ; i++) {
+		while (MAX_SCORE > Player.getRoundScore() && speelRonde) {
 			System.out.println("\n\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
 			System.out.print("uw invoer:   ");
 			String invoer = sc.next().toLowerCase();
 			if(invoer.equals("q")) {
+				System.out.printf("Het spel is gestopt");
 				break;
 			}
 			if(invoer.equals("k")) {
 				Integer welkeKaart = Deck.shuffledDeck.get(0);
 				Deck.shuffledDeck.remove(welkeKaart);
-				System.out.printf("De kaart die ik krijg is een:  %s %s",
+				Player.addKaart(welkeKaart);
+				System.out.printf("De kaart die je krijgt is een:  %s%s%n",
 				deKaarten[welkeKaart].getSuitName(),
 				deKaarten[welkeKaart].getValueName());
 				Player.addRoundScore(deKaarten[welkeKaart].getWaarde());
-				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
 				
 			}
 			if(invoer.equals("p")) {
 				System.out.println("Je hebt gepast");
-				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
 				speelRonde = false;
 			}
+			if (Player.getRoundScore() > MAX_SCORE) {
+				System.out.println("Je hebt meer dan 21: You busted");
+			}
+			
+			System.out.printf("Jouw hand bestaat uit: ");
+			for (int num : Player.getSpelerKaarten()) {
+				System.out.printf("%s%s ",deKaarten[num].getSuitName().charAt(0),deKaarten[num].getValueName());
+			}
+			System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
 		}
 	}
 
