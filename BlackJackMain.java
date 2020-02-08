@@ -16,6 +16,8 @@ public class BlackJackMain {
 		
 		spel.beurtBank();
 		
+		spel.checkWinnaar();
+		
 	}
 
 	
@@ -251,6 +253,20 @@ class HetSpel {
 			System.out.printf("%n%nDe bank heeft nu %d punten",
 								Bank.getBankRoundScore());
 								
+		}
+	}
+	
+	void checkWinnaar() {
+		if (Player.getRoundScore() == 21) {
+			System.out.println("\n\nJe hebt blackjack, je hebt gewonnen!");
+		} else if (Player.getRoundScore() > 21) {
+			System.out.println("\n\nYou busted! je hebt verloren!");
+		} else if (Player.getRoundScore() == Bank.getBankRoundScore()) {
+			System.out.println("\n\nJe hebt even veel als de bank, je behoudt je inzet");
+		} else if (Player.getRoundScore() > Bank.getBankRoundScore()) {
+			System.out.println("\n\nJe hebt meer dan de bank, je hebt gewonnen");
+		}	else {
+			System.out.println("\n\nJe hebt minder dan de bank, je hebt verloren.");
 		}
 	}
 
