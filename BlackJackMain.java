@@ -13,6 +13,9 @@ public class BlackJackMain {
 		
 		spel.giveFirstCards();
 		spel.speelRonden();
+		
+		spel.beurtBank();
+		
 	}
 
 	
@@ -109,6 +112,34 @@ class Player {
 	
 }
 
+class Bank {
+	static final String bankName = "Bank";
+	private static int roundScoreBank;
+	private static ArrayList<Integer> bankKaarten = new ArrayList<Integer>();
+	
+	public static int getBankRoundScore() {
+		return roundScoreBank;
+	}
+	
+	public static void addKaartBank(int verkregenKaartBank) {
+		bankKaarten.add(verkregenKaartBank);
+	}
+	
+	public static ArrayList<Integer> getBankKaarten() {
+		return bankKaarten;
+	}
+	
+	public static void addRoundScoreBank(int addToRoundScoreBank) {
+		roundScoreBank += addToRoundScoreBank;
+	}
+	
+	public static int tweedeKaartBank() {
+		return bankKaarten.get(1);
+	}
+	
+	
+}
+
 class HetSpel {
 	final static int MAX_SCORE = 21;
 	
@@ -131,13 +162,11 @@ class HetSpel {
 	void giveFirstCards() {
 		Integer eersteKaart = Deck.shuffledDeck.get(0);
 		Deck.shuffledDeck.remove(eersteKaart);
+		Player.addKaart(eersteKaart);
 		Integer tweedeKaart = Deck.shuffledDeck.get(0);
 		Deck.shuffledDeck.remove(tweedeKaart);
-		
-		Player.addKaart(eersteKaart);
 		Player.addKaart(tweedeKaart);
-		
-		
+				
 		System.out.printf("Jouw kaarten zijn: %s%s en een %s%s",
 						deKaarten[eersteKaart].getSuitName(),
 						deKaarten[eersteKaart].getValueName(),
@@ -146,6 +175,21 @@ class HetSpel {
 						);
 		Player.addRoundScore(deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde());
 		System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
+		
+		Integer eersteKaartBank = Deck.shuffledDeck.get(0);
+		Deck.shuffledDeck.remove(eersteKaartBank);
+		Bank.addKaartBank(eersteKaartBank);
+		Integer tweedeKaartBank = Deck.shuffledDeck.get(0);
+		Deck.shuffledDeck.remove(tweedeKaartBank);
+		Bank.addKaartBank(tweedeKaartBank);
+		
+		Bank.addRoundScoreBank(deKaarten[eersteKaartBank].getWaarde());
+		System.out.printf("%n%nDe bank toont een: %s%s",
+				deKaarten[eersteKaartBank].getSuitName(),
+				deKaarten[eersteKaartBank].getValueName()
+				);
+		
+		
 	}
 	
 	void speelRonden(){
@@ -164,8 +208,8 @@ class HetSpel {
 				Deck.shuffledDeck.remove(welkeKaart);
 				Player.addKaart(welkeKaart);
 				System.out.printf("De kaart die je krijgt is een:  %s%s%n",
-				deKaarten[welkeKaart].getSuitName(),
-				deKaarten[welkeKaart].getValueName());
+							deKaarten[welkeKaart].getSuitName(),
+							deKaarten[welkeKaart].getValueName());
 				Player.addRoundScore(deKaarten[welkeKaart].getWaarde());
 				
 			}
@@ -182,6 +226,31 @@ class HetSpel {
 				System.out.printf("%s%s ",deKaarten[num].getSuitName().charAt(0),deKaarten[num].getValueName());
 			}
 			System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", Player.getRoundScore());
+		}
+	}
+	
+	void beurtBank() {
+		System.out.println("\n\nHet is nu de beurt van de bank");
+		System.out.printf("\nDe bank zijn 2e kaart is: %s%s%n", 				
+						deKaarten[Bank.tweedeKaartBank()].getSuitName(),
+						deKaarten[Bank.tweedeKaartBank()].getValueName());
+		System.out.printf("De bank haar hand bestaat uit: ");
+		for (int num : Bank.getBankKaarten()) {
+			System.out.printf("%s%s ",deKaarten[num].getSuitName().charAt(0),deKaarten[num].getValueName());
+		}
+		System.out.printf("%nMet een totale waarde van: %d",Bank.getBankRoundScore());
+		
+		while (Bank.getBankRoundScore() < 17) {
+			Integer welkeKaartBank = Deck.shuffledDeck.get(0);
+			Deck.shuffledDeck.remove(welkeKaartBank);
+			Bank.addKaartBank(welkeKaartBank);
+			System.out.printf("%nDe bank trekt een: %s%s",
+					deKaarten[welkeKaartBank].getSuitName(),
+					deKaarten[welkeKaartBank].getValueName());
+			Bank.addRoundScoreBank(deKaarten[welkeKaartBank].getWaarde());
+			System.out.printf("%n%nDe bank heeft nu %d punten",
+								Bank.getBankRoundScore());
+								
 		}
 	}
 
