@@ -6,10 +6,16 @@ public class BlackJackMain {
 	public static void main(String[] args) {
 		HetSpel spel = new HetSpel();
 		
+		spel.giveStartBalance(); 
+		
+		spel.plaatsInzet();
+		
 		spel.verkrijgKaarten();
 		
 		Deck.getDeck();
 		Deck.shuffleDeck();
+		
+		
 		
 		spel.giveFirstCards();
 		spel.speelRonden();
@@ -76,11 +82,20 @@ class Player {
 	
 	private String name;
 	private static int roundScore;
-	private int balance;
+	private static int balance;
+	private static int rondeInzet;
 	private static ArrayList<Integer> spelerKaarten = new ArrayList<Integer>();
 	
 	public static int getRoundScore() {
 		return roundScore;
+	}
+	
+	public static int getBalance() {
+		return balance;
+	}
+	
+	public static int getRondeInzet() {
+		return rondeInzet;
 	}
 	
 	public static void addRoundScore(int addToRoundScore) {
@@ -112,6 +127,18 @@ class Player {
 		return spelerKaarten;
 	}
 	
+	public static void addBalance(int addedProfit) {
+		balance += addedProfit;
+	}
+	
+	public static void substractBalance(int substractedLoss) {
+		balance -= substractedLoss;
+	}
+	
+	public static void setRondeInzet(int ingevoerdeRondeInzet) {
+		rondeInzet = ingevoerdeRondeInzet;
+	}
+	
 }
 
 class Bank {
@@ -139,7 +166,6 @@ class Bank {
 		return bankKaarten.get(1);
 	}
 	
-	
 }
 
 class HetSpel {
@@ -159,6 +185,24 @@ class HetSpel {
 				totaalTeller++;
 			}
 		}
+	}
+	
+	void giveStartBalance() {
+		System.out.println("Met hoeveel geld wil je aan tafel zitten?");
+		System.out.print("uw invoer(alleen cijfers):   ");
+		int invoerStartBalans = sc.nextInt();
+		Player.addBalance(invoerStartBalans);
+		
+		System.out.printf("%n%nJe begint het spel met %d euro aan tafel%n%n",
+						Player.getBalance());
+		
+	}
+	
+	void plaatsInzet() {
+		System.out.println("Hoeveel wil je inztten?");
+		System.out.print("uw invoer(alleen cijfers):   ");
+		int rondeInzet = sc.nextInt();
+		Player.setRondeInzet(rondeInzet);
 	}
 	
 	void giveFirstCards() {
@@ -186,6 +230,7 @@ class HetSpel {
 		Bank.addKaartBank(tweedeKaartBank);
 		
 		Bank.addRoundScoreBank(deKaarten[eersteKaartBank].getWaarde());
+		Bank.addRoundScoreBank(deKaarten[tweedeKaartBank].getWaarde());
 		System.out.printf("%n%nDe bank toont een: %s%s",
 				deKaarten[eersteKaartBank].getSuitName(),
 				deKaarten[eersteKaartBank].getValueName()
@@ -233,7 +278,7 @@ class HetSpel {
 	
 	void beurtBank() {
 		System.out.println("\n\nHet is nu de beurt van de bank");
-		System.out.printf("\nDe bank zijn 2e kaart is: %s%s%n", 				
+		System.out.printf("\nDe bank haar 2e kaart is: %s%s%n", 				
 						deKaarten[Bank.tweedeKaartBank()].getSuitName(),
 						deKaarten[Bank.tweedeKaartBank()].getValueName());
 		System.out.printf("De bank haar hand bestaat uit: ");
@@ -259,15 +304,20 @@ class HetSpel {
 	void checkWinnaar() {
 		if (Player.getRoundScore() == 21) {
 			System.out.println("\n\nJe hebt blackjack, je hebt gewonnen!");
+			Player.addBalance(Player.getRondeInzet());
 		} else if (Player.getRoundScore() > 21) {
 			System.out.println("\n\nYou busted! je hebt verloren!");
+			Player.substractBalance(Player.getRondeInzet());
 		} else if (Player.getRoundScore() == Bank.getBankRoundScore()) {
 			System.out.println("\n\nJe hebt even veel als de bank, je behoudt je inzet");
 		} else if (Player.getRoundScore() > Bank.getBankRoundScore()) {
 			System.out.println("\n\nJe hebt meer dan de bank, je hebt gewonnen");
+			Player.addBalance(Player.getRondeInzet());
 		}	else {
 			System.out.println("\n\nJe hebt minder dan de bank, je hebt verloren.");
+			Player.substractBalance(Player.getRondeInzet());
 		}
+		System.out.printf("Jouw balans is nu %d", Player.getBalance());
 	}
 
 }
