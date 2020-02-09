@@ -17,9 +17,7 @@ public class BlackJackMain {
 		Deck.shuffleDeck();
 
 		while (true) {
-			spel.plaatsInzet();		
 			
-			spel.giveFirstCards();
 			spel.speelRonden();
 			
 			spel.beurtBank();
@@ -218,9 +216,9 @@ class HetSpel {
 				aantalSpelers = inputSpelers;
 				System.out.println("Vul de namen in van de spelers");
 				
-				for (int i = 0; i <= aantalSpelers; i++) {
-					System.out.printf("Naam speler %d:   ", i);
-					String naam = sc.nextLine();
+				for (int i = 0; i < aantalSpelers; i++) {
+					System.out.printf("Naam speler %d:   ", i+1);
+					String naam = sc.next();
 					lijstSpelers.add(i, new Player(naam));
 				}
 			}
@@ -303,6 +301,9 @@ class HetSpel {
 	
 	void speelRonden(){
 		
+		
+		plaatsInzet();	
+		giveFirstCards();
 		// loop door alle spelers geef iedereen een beurt.
 		// wanneer speler quit uit spel halen, rest gaat verder
 		// max inzet niet hoger dan balans
@@ -318,8 +319,8 @@ class HetSpel {
 			speelRonde = true;
 			
 			while (MAX_SCORE > spelers.getRoundScore() && speelRonde) {
-				System.out.println("\n\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
-				System.out.print("uw invoer:   ");
+				System.out.println("\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
+				System.out.print("uw invoer:  ");
 				String invoer = sc.next().toLowerCase();
 				if(invoer.equals("q")) {
 					System.out.printf("Het spel is gestopt");
@@ -380,7 +381,6 @@ class HetSpel {
 	void checkWinnaar() {
 		
 		// loop door spelers bekijk bij iedereen gewonnen of verloren add/substract balance
-		// blackjack geen 21 nog veranderen als string speler 2 kaarten heeft met een 10 waarde kaart en een A.
 		
 		for(Player spelers : lijstSpelers) {
 			System.out.println(spelers.getName());
