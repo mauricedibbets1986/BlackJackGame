@@ -85,6 +85,7 @@ class Player {
 	private int balance;
 	private static int rondeInzet;
 	private ArrayList<Integer> spelerKaarten = new ArrayList<Integer>();
+	private boolean isPlaying = true;
 	
 	public Player(String name) {
 		this.playerName = name;
@@ -105,6 +106,14 @@ class Player {
 	
 	public static int getRondeInzet() {
 		return rondeInzet;
+	}
+	
+	public boolean getPlaying() {
+		return isPlaying;
+	}
+	
+	public void setPlaying (boolean playingStatus ) {
+		isPlaying = playingStatus;
 	}
 	
 	public void addRoundScore(int addToRoundScore) {
@@ -247,39 +256,42 @@ class HetSpel {
 	void plaatsInzet() {
 		
 		for(Player spelers : lijstSpelers) {
-			System.out.printf("%n%s hoeveel wil je inztten?",
-								spelers.getName());
-			System.out.printf("%nuw invoer(alleen cijfers):   ");
-			int rondeInzet = sc.nextInt();
-			spelers.setRondeInzet(rondeInzet);
+			if (spelers.getPlaying()) {
+				System.out.printf("%n%s hoeveel wil je inztten?",
+									spelers.getName());
+				System.out.printf("%nuw invoer(alleen cijfers):   ");
+				int rondeInzet = sc.nextInt();
+				spelers.setRondeInzet(rondeInzet);
+			}
 		}
-	
-		
 	}
 	
 	void giveFirstCards() {
 		aanDeBeurt = 0;
+		
 		// loop door spelers geef iedereen een kaart
 		for(Player spelers : lijstSpelers) {
+			if (spelers.getPlaying()) {
+				Integer eersteKaart = Deck.shuffledDeck.get(0);
+				Deck.shuffledDeck.remove(eersteKaart);
+				spelers.addKaart(eersteKaart);
+				Integer tweedeKaart = Deck.shuffledDeck.get(0);
+				Deck.shuffledDeck.remove(tweedeKaart);
+				spelers.addKaart(tweedeKaart);
+						
+				System.out.printf("%n%n%s%nJouw kaarten zijn: %s%s en een %s%s",
+								spelers.getName(),
+								deKaarten[eersteKaart].getSuitName(),
+								deKaarten[eersteKaart].getValueName(),
+								deKaarten[tweedeKaart].getSuitName(),
+								deKaarten[tweedeKaart].getValueName()
+								);
+				spelers.addRoundScore(deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde());
+				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", spelers.getRoundScore());
+			}
 			aanDeBeurt += 1;
-			Integer eersteKaart = Deck.shuffledDeck.get(0);
-			Deck.shuffledDeck.remove(eersteKaart);
-			spelers.addKaart(eersteKaart);
-			Integer tweedeKaart = Deck.shuffledDeck.get(0);
-			Deck.shuffledDeck.remove(tweedeKaart);
-			spelers.addKaart(tweedeKaart);
-					
-			System.out.printf("%n%n%s%nJouw kaarten zijn: %s%s en een %s%s",
-							spelers.getName(),
-							deKaarten[eersteKaart].getSuitName(),
-							deKaarten[eersteKaart].getValueName(),
-							deKaarten[tweedeKaart].getSuitName(),
-							deKaarten[tweedeKaart].getValueName()
-							);
-			spelers.addRoundScore(deKaarten[eersteKaart].getWaarde() + deKaarten[tweedeKaart].getWaarde());
-			System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", spelers.getRoundScore());
+			
 		}
-		
 		
 		// geef bank kaarten
 		Integer eersteKaartBank = Deck.shuffledDeck.get(0);
@@ -314,42 +326,47 @@ class HetSpel {
 			
 		
 		for(Player spelers : lijstSpelers) {
-			System.out.printf("%n%n%s is aan de beurt", spelers.getName());
 			aanDeBeurt++;
 			speelRonde = true;
 			
-			while (MAX_SCORE > spelers.getRoundScore() && speelRonde) {
-				System.out.println("\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
-				System.out.print("uw invoer:  ");
-				String invoer = sc.next().toLowerCase();
-				if(invoer.equals("q")) {
-					System.out.printf("Het spel is gestopt");
-					break;
+			if (spelers.getPlaying()) {
+				System.out.printf("%n%n%s is aan de beurt", spelers.getName());
+				while (MAX_SCORE > spelers.getRoundScore() && speelRonde) {
+					System.out.println("\nDruk (K) voor nieuwe kaart, (P) om te passen of (Q) om te stoppen");
+					System.out.print("uw invoer:  ");
+					String invoer = sc.next().toLowerCase();
+					if(invoer.equals("q")) {
+						System.out.printf("Je stopt met spelen na deze ronde%n", spelers.getBalance());
+						spelers.setPlaying(false);
+						break;
+					}
+					if(invoer.equals("k")) {
+						Integer welkeKaart = Deck.shuffledDeck.get(0);
+						Deck.shuffledDeck.remove(welkeKaart);
+						spelers.addKaart(welkeKaart);
+						System.out.printf("%nDe kaart die je krijgt is een:  %s%s",
+									deKaarten[welkeKaart].getSuitName(),
+									deKaarten[welkeKaart].getValueName());
+						spelers.addRoundScore(deKaarten[welkeKaart].getWaarde());
+						System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", spelers.getRoundScore());
+						System.out.printf("%nJouw hand bestaat uit: %n");
+						for (int num : spelers.getSpelerKaarten()) {
+							System.out.printf("%s%s ",deKaarten[num].getSuitName().charAt(0),deKaarten[num].getValueName());
+						}
+						
+					}
+					if(invoer.equals("p")) {
+						System.out.println("Je hebt gepast");
+						speelRonde = false;
+					}
+					if (spelers.getRoundScore() > MAX_SCORE) {
+						System.out.println("Je hebt meer dan 21: You busted");
+					}
 				}
-				if(invoer.equals("k")) {
-					Integer welkeKaart = Deck.shuffledDeck.get(0);
-					Deck.shuffledDeck.remove(welkeKaart);
-					spelers.addKaart(welkeKaart);
-					System.out.printf("De kaart die je krijgt is een:  %s%s%n",
-								deKaarten[welkeKaart].getSuitName(),
-								deKaarten[welkeKaart].getValueName());
-					spelers.addRoundScore(deKaarten[welkeKaart].getWaarde());
-					
-				}
-				if(invoer.equals("p")) {
-					System.out.println("Je hebt gepast");
-					speelRonde = false;
-				}
-				if (spelers.getRoundScore() > MAX_SCORE) {
-					System.out.println("Je hebt meer dan 21: You busted");
-				}
-				
-				System.out.printf("Jouw hand bestaat uit: ");
-				for (int num : spelers.getSpelerKaarten()) {
-					System.out.printf("%s%s ",deKaarten[num].getSuitName().charAt(0),deKaarten[num].getValueName());
-				}
-				System.out.printf("%nJouw kaarten hebben een totale waarde van: %d", spelers.getRoundScore());	
+			} else {
+				speelRonde = false;
 			}
+
 		}
 	}
 	
@@ -368,11 +385,11 @@ class HetSpel {
 			Integer welkeKaartBank = Deck.shuffledDeck.get(0);
 			Deck.shuffledDeck.remove(welkeKaartBank);
 			Bank.addKaartBank(welkeKaartBank);
-			System.out.printf("%nDe bank trekt een: %s%s",
+			System.out.printf("%n%nDe bank trekt een: %s%s",
 					deKaarten[welkeKaartBank].getSuitName(),
 					deKaarten[welkeKaartBank].getValueName());
 			Bank.addRoundScoreBank(deKaarten[welkeKaartBank].getWaarde());
-			System.out.printf("%n%nDe bank heeft nu %d punten",
+			System.out.printf("%nDe bank heeft nu %d punten%n",
 								Bank.getBankRoundScore());
 								
 		}
@@ -383,7 +400,7 @@ class HetSpel {
 		// loop door spelers bekijk bij iedereen gewonnen of verloren add/substract balance
 		
 		for(Player spelers : lijstSpelers) {
-			System.out.println(spelers.getName());
+			System.out.println("\n"+spelers.getName());
 			if (spelers.getRoundScore() == 21 && spelers.getSpelerKaarten().size() == 2) {
 				System.out.println("Je hebt blackjack, je hebt gewonnen!");
 				spelers.addBalance(spelers.getRondeInzet()*2);
@@ -402,7 +419,15 @@ class HetSpel {
 				System.out.println("Je hebt minder dan de bank, je hebt verloren.");
 				spelers.substractBalance(spelers.getRondeInzet());
 			}
-			System.out.printf("Jouw balans is nu %d%n%n", spelers.getBalance());
+			
+			if (spelers.getPlaying()) {
+				System.out.printf("Jouw balans is nu %d%n%n", spelers.getBalance());
+			}
+	
+			if (!spelers.getPlaying()) {
+				System.out.printf("Je bent gestopt met spelen en neemt naar huis %d%n", 
+									spelers.getBalance());
+			}
 		}
 		
 		Bank.resetRoundScoreBank();
